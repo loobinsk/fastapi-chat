@@ -1,0 +1,98 @@
+# Python-specific ignores
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.db_env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+**/.test_env/
+**/.penv/
+**/.venv/
+**/.s3env/
+s3_service/3env/
+public_api/venv/
+psql/.test_env
+# Spyder project settings
+.spyderproject
+.spyproject
+*env*
+# Rope project settings
+.ropeproject
+*logs/*
+*log*
+**/logs/
+s3_service/logs/
+public_api/logs/
+.s3_service/
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# C extensions
+*.so
+
+# VScode settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .chat-messages {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .message.sender {
+            align-self: flex-end;
+            background-color: #DCF8C6;
+        }
+        .message-body {
+            word-wrap: break-word;
+        }
+        .chat-input {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+        .input-field {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .send-button {
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .send-button:hover {
+            background-color: #0056b3;
+        }
+        .typing-indicator {
+            font-style: italic;
+            color: #aaa;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="message-input" class="input-field" placeholder="Введите сообщение...">
+            <button id="send-button" class="send-button">Отправить</button>
+        </div>
+        <div class="typing-indicator" id="typing-indicator"></div>
+    </div>
+
+    <script>
+        const socket = new WebSocket(`ws://127.0.0.1:8000/ws/client123`);
+
+        socket.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            displayMessage(message);
+        };
+
+        socket.onopen = function(event) {
+            console.log("WebSocket connected");
+        };
+
+        socket.onclose = function(event) {
+            console.log("WebSocket closed");
+        };
+
+        socket.onerror = function(event) {
+            console.error("WebSocket error:", event);
+        };
+
+        const messageInput = document.getElementById("message-input");
+        const sendButton = document.getElementById("send-button");
+        const typingIndicator = document.getElementById("typing-indicator");
+
+        sendButton.addEventListener("click", function() {
+            const message = messageInput.value.trim();
+            if (message !== "") {
+                sendMessage(message);
+                messageInput.value = "";
+            }
+        });
+
+        messageInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendButton.click();
+            } else {
+                updateTypingStatus(true);
+            }
+        });
+
+        messageInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                updateTypingStatus(false);
+            }
+        });
+
+        function sendMessage(message) {
+            const data = {
+                client_id: "client123",
+                message: message
+            };
+            socket.send(JSON.stringify(data));
+        }
+
+        function updateTypingStatus(typing) {
+            const data = {
+                client_id: "client123",
+                typing: typing
+            };
+            socket.send(JSON.stringify(data));
+        }
+
+        function displayMessage(message) {
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+            if (message.client_id === "client123") {
+                messageElement.classList.add("sender");
+            }
+            const messageBody = document.createElement("div");
+            messageBody.classList.add("message-body");
+            messageBody.textContent = message.message;
+            messageElement.appendChild(messageBody);
+            document.getElementById("chat-messages").appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const chatMessages = document.getElementById("chat-messages");
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function displayTypingIndicator(typing) {
+            typingIndicator.textContent = typing ? "Собеседник набирает сообщение..." : "";
+        }
+
+        setInterval(function() {
+            displayTypingIndicator(false);
+        }, 3000);
+    </script>
+</body>
+</html>
